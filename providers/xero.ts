@@ -3,7 +3,7 @@ import { XeroClient } from 'xero-node';
 export const client = new XeroClient({
     clientId: process.env.XERO_CLIENT_ID || '',
     clientSecret: process.env.XERO_CLIENT_SECRET || '',
-    redirectUris: ['http://localhost:3000/api/callback/xero'],
+    redirectUris: ['http://localhost:3000/api/auth/callback/xero'],
     scopes: [
         'assets.read',
         'accounting.settings.read',

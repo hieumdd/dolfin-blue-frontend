@@ -11,7 +11,12 @@ const Home: NextPage<HomePageProps> = ({ url }) => {
     const { data } = useSession();
 
     console.log(data);
-    return <a href={url}>{url}</a>;
+    return (
+        <>
+            <div>{JSON.stringify(data)}</div>
+            <a href={url}>{url}</a>;
+        </>
+    );
 };
 
 export const getStaticProps: GetStaticProps<HomePageProps> = () =>
