@@ -1,0 +1,4 @@
+accounting.transactions accounting.settings accounting.contacts assets assets.read accounting.settings.read accounting.journals.read accounting.budgets.read accounting.reports.read accounting.transactions.read accounting.contacts.read
+
+
+assets.read accounting.settings.read accounting.journals.read accounting.budgets.read accounting.reports.read accounting.transactions.read accounting.contacts.read
