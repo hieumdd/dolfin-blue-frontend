@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth from 'next-auth/next';
 
-import { client } from '../../../providers/xero';
+import { client, getCodeCallbackUrl } from '../../../providers/xero';
 
 const nextAuth = async (req: NextApiRequest, res: NextApiResponse) =>
     client.buildConsentUrl().then((authorization) =>
         NextAuth(req, res, {
             secret: '123',
-            site: process.env.NEXTAUTH_URL,
+            debug: false,
             providers: [
                 {
                     id: 'xero',
@@ -16,19 +16,38 @@ const nextAuth = async (req: NextApiRequest, res: NextApiResponse) =>
                     clientId: client.config?.clientId,
                     clientSecret: client.config?.clientSecret,
                     authorization,
-                    token: 'https://identity.xero.com/connect/token',
-                    userinfo: {
-                        // @ts-expect-error
-                        request: () => {},
+                    token: {
+                        async request(context) {
+                            const url = getCodeCallbackUrl(
+                                <string>context.params.code,
+                            );
+                            const tokens = await client.apiCallback(url);
+                            return { tokens };
+                        },
+                    },
+                    idToken: true,
+                    async profile(profile) {
+                        return {
+                            id: profile.xero_userid,
+                            email: profile.email,
+                        };
                     },
                 },
             ],
             callbacks: {
-                redirect: async({url, baseUrl}) => {
-                    console.log({ url, baseUrl });
-                    // return `${baseUrl}`;
-                    return Promise.resolve(`https://google.com`);
+                async jwt({ token, account }) {
+                    if (account) {
+                        token.accessToken = account.access_token;
+                    }
+                    return token;
                 },
+                session({ session, token }) {
+                    session.accessToken = token.accessToken
+                    return session;
+                },
+            },
+            pages: {
+                signIn: '/',
             },
         }),
     );

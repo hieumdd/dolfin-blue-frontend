@@ -1,5 +1,5 @@
 import type { NextPage, GetStaticProps } from 'next';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 
 import { client } from '../providers/xero';
 
@@ -11,10 +11,13 @@ const Home: NextPage<HomePageProps> = ({ url }) => {
     const { data } = useSession();
 
     console.log(data);
+
+    const handleLogin = () =>
+        signIn('xero', { redirect: false, callbackUrl: '/' });
     return (
         <>
             <div>{JSON.stringify(data)}</div>
-            <a href={url}>{url}</a>;
+            <button onClick={handleLogin}>{url}</button>
         </>
     );
 };

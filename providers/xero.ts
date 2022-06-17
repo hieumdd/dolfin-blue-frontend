@@ -1,10 +1,16 @@
 import { XeroClient } from 'xero-node';
 
+const redirectUri = 'http://localhost:3000/api/auth/callback/xero';
+const callbackUrl = '';
+
 export const client = new XeroClient({
     clientId: process.env.XERO_CLIENT_ID || '',
     clientSecret: process.env.XERO_CLIENT_SECRET || '',
-    redirectUris: ['http://localhost:3000/api/auth/callback/xero'],
+    redirectUris: [redirectUri],
     scopes: [
+        'openid',
+        'email',
+        'offline_access',
         'assets.read',
         'accounting.settings.read',
         'accounting.journals.read',
@@ -14,3 +20,10 @@ export const client = new XeroClient({
         'accounting.contacts.read',
     ],
 });
+
+
+export const getCodeCallbackUrl = (code: string) => {
+    const url = new URL('http://localhost:3000/api/auth/callback/xero');
+    url.searchParams.append('code', code);
+    return url.toString();
+};
