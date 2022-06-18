@@ -1,28 +1,19 @@
-import type { NextPage, GetStaticProps } from 'next';
-import { signIn, useSession } from 'next-auth/react';
+import type { NextPage } from 'next';
+import { useSession } from 'next-auth/react';
 
-import { xero } from '../providers/xero';
+import { VStack } from '@chakra-ui/react';
+import SessionInfo from '../page-components/Home/SessionInfo';
+import SignIn from '../page-components/Home/SignIn';
 
-type HomePageProps = {
-    url: string;
-};
+const Home: NextPage = () => {
+    const { data: session } = useSession();
 
-const Home: NextPage<HomePageProps> = ({ url }) => {
-    const { data } = useSession();
-
-    console.log(data);
-
-    const handleLogin = () =>
-        signIn('xero', { redirect: false, callbackUrl: '/' });
     return (
-        <>
-            <div>{JSON.stringify(data)}</div>
-            <button onClick={handleLogin}>{url}</button>
-        </>
+        <VStack w="full" alignItems="stretch">
+            {session && <SessionInfo email={session.user?.email as string} />}
+            <SignIn />
+        </VStack>
     );
 };
-
-export const getStaticProps: GetStaticProps<HomePageProps> = () =>
-    xero.buildConsentUrl().then((url) => ({ props: { url } }));
 
 export default Home;
