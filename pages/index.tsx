@@ -1,7 +1,7 @@
 import type { NextPage, GetStaticProps } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 
-import { client } from '../providers/xero';
+import { xero } from '../providers/xero';
 
 type HomePageProps = {
     url: string;
@@ -23,6 +23,6 @@ const Home: NextPage<HomePageProps> = ({ url }) => {
 };
 
 export const getStaticProps: GetStaticProps<HomePageProps> = () =>
-    client.buildConsentUrl().then((url) => ({ props: { url } }));
+    xero.buildConsentUrl().then((url) => ({ props: { url } }));
 
 export default Home;

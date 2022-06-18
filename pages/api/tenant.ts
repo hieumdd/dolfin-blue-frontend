@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { getSession } from 'next-auth/react';
 
-import { client } from '../../providers/xero';
+import { xero } from '../../providers/xero';
 
 const getTenant = async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await getSession({ req });
@@ -11,10 +11,10 @@ const getTenant = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(403).json({ err: 'Forbidden' });
         return;
     }
-    client.setTokenSet({ access_token: <string>session.accessToken });
-    await client.updateTenants();
+    xero.setTokenSet({ access_token: <string>session.accessToken });
+    await xero.updateTenants();
 
-    const { tenants } = client;
+    const { tenants } = xero;
     const tenant = tenants.pop();
     res.json({ tenant });
     return;

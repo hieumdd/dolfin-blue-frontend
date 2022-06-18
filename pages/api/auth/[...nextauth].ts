@@ -1,27 +1,46 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth from 'next-auth/next';
+import { EventCallbacks, TokenSet } from 'next-auth';
 
-import { client, getCodeCallbackUrl } from '../../../providers/xero';
+import { Repository } from '../../../providers/firestore';
+import { xero, getCodeCallbackUrl } from '../../../providers/xero';
+import { User } from '../../../feature/user/user.entity';
+
+const createUser: EventCallbacks['signIn'] = async ({ user, account }) => {
+    xero.setTokenSet(account);
+    await xero.updateTenants();
+
+    const userRepository = new Repository<User>('xero-dev/auth/users');
+
+    await userRepository.create({
+        id: user.id,
+        email: <string>user.email,
+        tokens: <TokenSet>account,
+        tenants: xero.tenants.map(({ tenantId, tenantName }) => ({
+            id: tenantId,
+            name: tenantName,
+        })),
+    });
+};
 
 const nextAuth = async (req: NextApiRequest, res: NextApiResponse) =>
-    client.buildConsentUrl().then((authorization) =>
+    xero.buildConsentUrl().then((authorization) =>
         NextAuth(req, res, {
-            secret: '123',
             debug: false,
             providers: [
                 {
                     id: 'xero',
                     name: 'Xero',
                     type: 'oauth',
-                    clientId: client.config?.clientId,
-                    clientSecret: client.config?.clientSecret,
+                    clientId: xero.config?.clientId,
+                    clientSecret: xero.config?.clientSecret,
                     authorization,
                     token: {
                         async request(context) {
                             const url = getCodeCallbackUrl(
                                 <string>context.params.code,
                             );
-                            const tokens = await client.apiCallback(url);
+                            const tokens = await xero.apiCallback(url);
                             return { tokens };
                         },
                     },
@@ -42,9 +61,15 @@ const nextAuth = async (req: NextApiRequest, res: NextApiResponse) =>
                     return token;
                 },
                 session({ session, token }) {
-                    session.accessToken = token.accessToken
+                    session.accessToken = token.accessToken;
                     return session;
                 },
+            },
+            jwt: {
+                maxAge: 60 * 60 * 24 * 30,
+            },
+            events: {
+                signIn: createUser,
             },
             pages: {
                 signIn: '/',
