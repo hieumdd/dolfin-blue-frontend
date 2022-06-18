@@ -12,7 +12,11 @@ export default class UserService {
         return this.userRepository.find();
     }
 
-    async set(user: Partial<User>) {
+    async create(user: Partial<User>) {
         return this.userRepository.create(user);
+    }
+
+    async update(user: User) {
+        return this.userRepository.update(user.id, user);
     }
 }

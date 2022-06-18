@@ -8,22 +8,37 @@ import SessionInfo from '../page-components/Home/SessionInfo';
 import SignIn from '../page-components/Home/SignIn';
 import Users from '../page-components/Home/Users';
 
-import { User } from '../feature/user/user.entity';
+import { User, Tenant } from '../feature/user/user.entity';
+
 const Home: NextPage = () => {
     const [users, setUsers] = useState<User[]>([]);
 
     const { data: session } = useSession();
 
-    useEffect(() => {
+    const getUsers = () => {
         requestApi({ method: 'GET', url: '/user' }).then(({ users }) =>
             setUsers(users),
         );
-    });
+    };
+
+    useEffect(getUsers);
+
+    const handleRemove = (userId: User['id']) => (tenantId: Tenant['id']) => () => {
+        const user = users.find(({ id }) => id === userId) as User;
+        requestApi({
+            method: 'PUT',
+            url: '/user',
+            data: {
+                ...user,
+                tenants: user.tenants.filter(({ id }) => id !== tenantId),
+            },
+        }).then(getUsers);
+    };
 
     return (
         <VStack w="full" alignItems="stretch">
             {session && <SessionInfo email={session.user?.email as string} />}
-            <Users users={users} />
+            <Users users={users} handleRemove={handleRemove} />
             <SignIn />
         </VStack>
     );

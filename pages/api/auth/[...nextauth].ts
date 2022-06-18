@@ -11,7 +11,7 @@ const createUser: EventCallbacks['signIn'] = async ({ user, account }) => {
 
     const userService = new UserService();
 
-    await userService.set({
+    await userService.create({
         id: user.id,
         email: <string>user.email,
         tokens: <TokenSet>account,

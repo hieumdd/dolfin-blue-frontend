@@ -2,8 +2,6 @@ import { FC } from 'react';
 import {
     VStack,
     StackDivider,
-    Text,
-    Accordion,
     AccordionItem,
     AccordionButton,
     AccordionPanel,
@@ -11,23 +9,39 @@ import {
     Box,
 } from '@chakra-ui/react';
 
-import { User } from '../../../feature/user/user.entity';
-import Tenant from './Tenant';
+import { User, Tenant as TenantProps } from '../../../feature/user/user.entity';
+import Tenant, { TenantHandleRemove } from './Tenant';
 
-const User: FC<User> = ({ id, email, tenants }) => (
-    <AccordionItem>
-        <AccordionButton>
-            <Box >{email}</Box>
-            <AccordionIcon />
-        </AccordionButton>
-        <AccordionPanel>
-            <VStack spacing={1} alignItems="stretch" divider={<StackDivider />}>
-                {tenants.map((tenant) => (
-                    <Tenant key={tenant.id} {...tenant} />
-                ))}
-            </VStack>
-        </AccordionPanel>
-    </AccordionItem>
-);
+export type UserHandleRemove = (id: TenantProps['id']) => TenantHandleRemove;
+
+type UserProps = User & {
+    handleRemove: UserHandleRemove;
+};
+
+const User: FC<UserProps> = ({ email, tenants, handleRemove }) => {
+    return (
+        <AccordionItem>
+            <AccordionButton>
+                <Box>{email}</Box>
+                <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+                <VStack
+                    spacing={1}
+                    alignItems="stretch"
+                    divider={<StackDivider />}
+                >
+                    {tenants.map((tenant) => (
+                        <Tenant
+                            key={tenant.id}
+                            {...tenant}
+                            handleRemove={handleRemove(tenant.id)}
+                        />
+                    ))}
+                </VStack>
+            </AccordionPanel>
+        </AccordionItem>
+    );
+};
 
 export default User;

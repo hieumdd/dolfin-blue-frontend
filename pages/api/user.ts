@@ -3,7 +3,7 @@ import { getSession } from 'next-auth/react';
 
 import UserService from '../../feature/user/user.service';
 
-const getUsers = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await getSession({ req });
 
     if (!session) {
@@ -13,7 +13,20 @@ const getUsers = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const userService = new UserService();
 
-    userService.get().then((users) => res.json({ users }));
+    switch (req.method) {
+        case 'GET':
+            userService.get().then((users) => res.json({ users }));
+            break;
+        case 'PUT':
+            console.log(req.body)
+            userService
+                .update(req.body)
+                .then((result) => res.json(result));
+            break;
+        default:
+            res.status(405).end();
+            break;
+    }
 };
 
-export default getUsers;
+export default handler;
