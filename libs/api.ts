@@ -4,7 +4,7 @@ const apiClient = axios.create({
     baseURL: '/api',
 });
 
-const requestApi = (config: AxiosRequestConfig) =>
-    apiClient.request(config).then(({ data }) => data);
+const requestApi = <T>(config: AxiosRequestConfig) =>
+    apiClient.request<T>(config).then(({ data }) => data);
 
 export default requestApi;

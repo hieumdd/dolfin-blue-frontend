@@ -16,29 +16,33 @@ const Home: NextPage = () => {
     const { data: session } = useSession();
 
     const getUsers = () => {
-        requestApi({ method: 'GET', url: '/user' }).then(({ users }) =>
-            setUsers(users),
+        requestApi<{ users: User[] }>({ method: 'GET', url: '/user' }).then(
+            ({ users }) =>
+                setUsers(users.filter(({ tenants }) => tenants.length > 0)),
         );
     };
 
     useEffect(getUsers);
 
-    const handleRemove = (userId: User['id']) => (tenantId: Tenant['id']) => () => {
-        const user = users.find(({ id }) => id === userId) as User;
-        requestApi({
-            method: 'PUT',
-            url: '/user',
-            data: {
-                ...user,
-                tenants: user.tenants.filter(({ id }) => id !== tenantId),
-            },
-        }).then(getUsers);
-    };
+    const handleRemove =
+        (userId: User['id']) => (tenantId: Tenant['id']) => () => {
+            const user = users.find(({ id }) => id === userId) as User;
+            requestApi<User>({
+                method: 'PUT',
+                url: '/user',
+                data: {
+                    ...user,
+                    tenants: user.tenants.filter(({ id }) => id !== tenantId),
+                },
+            }).then(getUsers);
+        };
 
     return (
         <VStack w="full" alignItems="stretch">
             {session && <SessionInfo email={session.user?.email as string} />}
-            <Users users={users} handleRemove={handleRemove} />
+            {users.length > 0 && (
+                <Users users={users} handleRemove={handleRemove} />
+            )}
             <SignIn />
         </VStack>
     );
