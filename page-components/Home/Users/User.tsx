@@ -20,7 +20,7 @@ type UserProps = User & {
 const User: FC<UserProps> = ({ email, tenants, handleRemove }) => {
     return (
         <AccordionItem>
-            <AccordionButton>
+            <AccordionButton justifyContent="space-between">
                 <Box>{email}</Box>
                 <AccordionIcon />
             </AccordionButton>
