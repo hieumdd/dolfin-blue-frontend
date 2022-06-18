@@ -21,11 +21,11 @@ const User: FC<UserProps> = ({ email, tenants, handleRemove }) => {
     return (
         <AccordionItem>
             <AccordionButton justifyContent="space-between">
-                <Box>{email}</Box>
+                <Box fontWeight="bold">{email}</Box>
                 <AccordionIcon />
             </AccordionButton>
-            <AccordionPanel>
-                <VStack spacing={1} alignItems="stretch">
+            <AccordionPanel py={2}>
+                <VStack spacing={2} alignItems="stretch">
                     {tenants.map((tenant) => (
                         <Tenant
                             key={tenant.id}
