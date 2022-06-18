@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { VStack } from '@chakra-ui/react';
 
-import axios from 'axios';
-
+import requestApi from '../libs/api';
 import SessionInfo from '../page-components/Home/SessionInfo';
 import SignIn from '../page-components/Home/SignIn';
 import Users from '../page-components/Home/Users';
@@ -16,10 +15,9 @@ const Home: NextPage = () => {
     const { data: session } = useSession();
 
     useEffect(() => {
-        axios
-            .get('/api/user')
-            .then(({ data }) => data)
-            .then(({ users }) => setUsers(users));
+        requestApi({ method: 'GET', url: '/user' }).then(({ users }) =>
+            setUsers(users),
+        );
     });
 
     return (
