@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import {
     VStack,
-    StackDivider,
     AccordionItem,
     AccordionButton,
     AccordionPanel,
@@ -26,11 +25,7 @@ const User: FC<UserProps> = ({ email, tenants, handleRemove }) => {
                 <AccordionIcon />
             </AccordionButton>
             <AccordionPanel>
-                <VStack
-                    spacing={1}
-                    alignItems="stretch"
-                    divider={<StackDivider />}
-                >
+                <VStack spacing={1} alignItems="stretch">
                     {tenants.map((tenant) => (
                         <Tenant
                             key={tenant.id}
