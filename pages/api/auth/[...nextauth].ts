@@ -2,17 +2,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth from 'next-auth/next';
 import { EventCallbacks, TokenSet } from 'next-auth';
 
-import { Repository } from '../../../providers/firestore';
 import { xero, getCodeCallbackUrl } from '../../../providers/xero';
-import { User } from '../../../feature/user/user.entity';
+import UserService from '../../../feature/user/user.service';
 
 const createUser: EventCallbacks['signIn'] = async ({ user, account }) => {
     xero.setTokenSet(account);
     await xero.updateTenants();
 
-    const userRepository = new Repository<User>('xero-dev/auth/users');
+    const userService = new UserService();
 
-    await userRepository.create({
+    await userService.set({
         id: user.id,
         email: <string>user.email,
         tokens: <TokenSet>account,
